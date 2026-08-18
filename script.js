@@ -51,6 +51,7 @@ form.addEventListener("submit", function(event) {
 localStorage.removeItem("bakeryRequest");
   form.reset();
 }
+ });                   
   const favoriteButton = document.getElementById("favorite-btn");
 
 if (favoriteButton) {
