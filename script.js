@@ -49,4 +49,13 @@ form.addEventListener("submit", function(event) {
   alert("Thank you! Your bakery request has been saved.");
 localStorage.removeItem("bakeryRequest");
   form.reset();
+
+  const favoriteButton = document.getElementById("favorite-btn");
+
+if (favoriteButton) {
+  favoriteButton.addEventListener("click", function() {
+    localStorage.setItem("favoriteProduct", "Signature Loaf");
+    favoriteButton.textContent = "Saved as Favorite ❤️";
+  });
+}
 });
