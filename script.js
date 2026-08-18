@@ -17,6 +17,7 @@ fields.forEach(function(id) {
   }
 });
 
+if (form) {
 form.addEventListener("submit", function(event) {
   event.preventDefault();
 
@@ -49,7 +50,7 @@ form.addEventListener("submit", function(event) {
   alert("Thank you! Your bakery request has been saved.");
 localStorage.removeItem("bakeryRequest");
   form.reset();
-
+}
   const favoriteButton = document.getElementById("favorite-btn");
 
 if (favoriteButton) {
