@@ -1,63 +1,135 @@
-const form = document.querySelector("form");
+document.addEventListener("DOMContentLoaded", function () {
+  const storageKey = "bakeryRequest";
 
-const savedData = JSON.parse(localStorage.getItem("bakeryRequest")) || {};
+  const fieldIds = [
+    "name",
+    "email",
+    "item-details",
+    "allergy-notes"
+  ];
 
-const fields = [
-  "name",
-  "email",
-  "item-details",
-  "allergy-notes"
-];
+  const favoriteProduct = {
+    name: "Signature Loaf",
+    storageKey: "favoriteProduct"
+  };
 
-fields.forEach(function(id) {
-  const field = document.getElementById(id);
-
-  if (field && savedData[id]) {
-    field.value = savedData[id];
-  }
-});
-
-if (form) {
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const name = document.getElementById("name");
-  const email = document.getElementById("email");
-
-  if (!name.value.trim()) {
-    alert("Please enter your name.");
-    name.focus();
-    return;
+  function getSavedFormData() {
+    return JSON.parse(localStorage.getItem(storageKey)) || {};
   }
 
-  if (!email.value.includes("@") || !email.value.includes(".")) {
-    alert("Please enter a valid email address.");
-    email.focus();
-    return;
+  function saveFormData() {
+    const requestData = {};
+
+    fieldIds.forEach(function (id) {
+      const field = document.getElementById(id);
+
+      if (field) {
+        requestData[id] = field.value;
+      }
+    });
+
+    localStorage.setItem(storageKey, JSON.stringify(requestData));
   }
 
-  const requestData = {};
+  function restoreFormData() {
+    const savedData = getSavedFormData();
 
-  fields.forEach(function(id) {
-    const field = document.getElementById(id);
-    if (field) {
-      requestData[id] = field.value;
+    fieldIds.forEach(function (id) {
+      const field = document.getElementById(id);
+
+      if (field && savedData[id]) {
+        field.value = savedData[id];
+      }
+    });
+  }
+
+  function showError(field, message) {
+    let error = field.parentElement.querySelector(".validation-error");
+
+    if (!error) {
+      error = document.createElement("p");
+      error.className = "validation-error";
+      field.insertAdjacentElement("afterend", error);
     }
-  });
 
-  localStorage.setItem("bakeryRequest", JSON.stringify(requestData));
+    error.textContent = message;
+    error.style.color = "darkred";
+    error.style.fontSize = "0.9rem";
+  }
 
-  alert("Thank you! Your bakery request has been saved.");
+  function clearErrors() {
+    document.querySelectorAll(".validation-error").forEach(function (error) {
+      error.remove();
+    });
+  }
 
-  
-}
- });                   
+  function validateForm() {
+    clearErrors();
+
+    const name = document.getElementById("name");
+    const email = document.getElementById("email");
+
+    let isValid = true;
+
+    if (!name.value.trim()) {
+      showError(name, "Please enter your full name.");
+      isValid = false;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email.value.trim() || !emailPattern.test(email.value)) {
+      showError(email, "Please enter a valid email address.");
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  const form = document.querySelector("form");
+
+  if (form) {
+    form.setAttribute("novalidate", "novalidate");
+
+    restoreFormData();
+
+    fieldIds.forEach(function (id) {
+      const field = document.getElementById(id);
+
+      if (field) {
+        field.addEventListener("input", saveFormData);
+        field.addEventListener("change", saveFormData);
+      }
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      saveFormData();
+      alert("Thank you! Your bakery request has been saved.");
+    });
+  }
+
   const favoriteButton = document.getElementById("favorite-btn");
 
-if (favoriteButton) {
-  favoriteButton.addEventListener("click", function() {
-    localStorage.setItem("favoriteProduct", "Signature Loaf");
-    favoriteButton.textContent = "Saved as Favorite ❤️";
-  });
-}
+  if (favoriteButton) {
+    const savedFavorite = localStorage.getItem(favoriteProduct.storageKey);
+
+    if (savedFavorite === favoriteProduct.name) {
+      favoriteButton.textContent = "Saved as Favorite ❤️";
+    }
+
+    favoriteButton.addEventListener("click", function () {
+      localStorage.setItem(
+        favoriteProduct.storageKey,
+        favoriteProduct.name
+      );
+
+      favoriteButton.textContent = "Saved as Favorite ❤️";
+    });
+  }
 });
