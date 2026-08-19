@@ -8,13 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
     "allergy-notes"
   ];
 
-  const favoriteProduct = {
-    name: "Signature Loaf",
-    storageKey: "favoriteProduct"
-  };
-
-  function getSavedFormData() {
-    return JSON.parse(localStorage.getItem(storageKey)) || {};
+  function getSavedData() {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {};
+    } catch (error) {
+      return {};
+    }
   }
 
   function saveFormData() {
@@ -32,65 +31,20 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function restoreFormData() {
-    const savedData = getSavedFormData();
+    const savedData = getSavedData();
 
     fieldIds.forEach(function (id) {
       const field = document.getElementById(id);
 
-      if (field && savedData[id]) {
+      if (field && savedData[id] !== undefined) {
         field.value = savedData[id];
       }
     });
   }
 
-  function showError(field, message) {
-    let error = field.parentElement.querySelector(".validation-error");
-
-    if (!error) {
-      error = document.createElement("p");
-      error.className = "validation-error";
-      field.insertAdjacentElement("afterend", error);
-    }
-
-    error.textContent = message;
-    error.style.color = "darkred";
-    error.style.fontSize = "0.9rem";
-  }
-
-  function clearErrors() {
-    document.querySelectorAll(".validation-error").forEach(function (error) {
-      error.remove();
-    });
-  }
-
-  function validateForm() {
-    clearErrors();
-
-    const name = document.getElementById("name");
-    const email = document.getElementById("email");
-
-    let isValid = true;
-
-    if (!name.value.trim()) {
-      showError(name, "Please enter your full name.");
-      isValid = false;
-    }
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email.value.trim() || !emailPattern.test(email.value)) {
-      showError(email, "Please enter a valid email address.");
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
   const form = document.querySelector("form");
 
   if (form) {
-    form.setAttribute("novalidate", "novalidate");
-
     restoreFormData();
 
     fieldIds.forEach(function (id) {
@@ -105,11 +59,31 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
 
-      if (!validateForm()) {
+      const name = document.getElementById("name");
+      const email = document.getElementById("email");
+
+      if (!name || !name.value.trim()) {
+        alert("Please enter your name.");
+        if (name) {
+          name.focus();
+        }
+        return;
+      }
+
+      if (
+        !email ||
+        !email.value.includes("@") ||
+        !email.value.includes(".")
+      ) {
+        alert("Please enter a valid email address.");
+        if (email) {
+          email.focus();
+        }
         return;
       }
 
       saveFormData();
+
       alert("Thank you! Your bakery request has been saved.");
     });
   }
@@ -117,18 +91,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const favoriteButton = document.getElementById("favorite-btn");
 
   if (favoriteButton) {
-    const savedFavorite = localStorage.getItem(favoriteProduct.storageKey);
+    const savedFavorite = localStorage.getItem("favoriteProduct");
 
-    if (savedFavorite === favoriteProduct.name) {
+    if (savedFavorite === "Signature Loaf") {
       favoriteButton.textContent = "Saved as Favorite ❤️";
     }
 
     favoriteButton.addEventListener("click", function () {
-      localStorage.setItem(
-        favoriteProduct.storageKey,
-        favoriteProduct.name
-      );
-
+      localStorage.setItem("favoriteProduct", "Signature Loaf");
       favoriteButton.textContent = "Saved as Favorite ❤️";
     });
   }
