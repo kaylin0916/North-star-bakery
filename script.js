@@ -48,8 +48,8 @@ form.addEventListener("submit", function(event) {
   localStorage.setItem("bakeryRequest", JSON.stringify(requestData));
 
   alert("Thank you! Your bakery request has been saved.");
-localStorage.removeItem("bakeryRequest");
-  form.reset();
+
+  
 }
  });                   
   const favoriteButton = document.getElementById("favorite-btn");
